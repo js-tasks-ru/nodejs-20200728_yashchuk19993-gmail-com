@@ -1,6 +1,7 @@
 const url = require('url');
 const http = require('http');
 const path = require('path');
+const fs = require('fs');
 
 const server = new http.Server();
 
@@ -11,6 +12,26 @@ server.on('request', (req, res) => {
 
   switch (req.method) {
     case 'GET':
+      if (pathname.includes(path.sep)) {
+        res.statusCode = 400;
+        res.end('Can`t contain slash symbol on the name');
+        return;
+      }
+
+      const stream = fs.createReadStream(filepath);
+
+      stream.on('error', (err) => {
+        if (err.code === 'ENOENT') {
+          res.statusCode = 404;
+          res.end('File not found.');
+        } else {
+          res.statusCode = 500;
+          res.end('Internal server error');
+        }
+      });
+
+      stream
+          .pipe(res);
 
       break;
 
