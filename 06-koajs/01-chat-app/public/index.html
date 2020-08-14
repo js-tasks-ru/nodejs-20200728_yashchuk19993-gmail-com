@@ -33,15 +33,24 @@
 
   function subscribe() {
     const xhr = new XMLHttpRequest();
-
-    xhr.open("GET", "/subscribe?r=" + Math.random(), true);
+    const msgCount = document.getElementById('messages').childElementCount;
+    xhr.open("GET", "/subscribe?r=" + Math.random() + "&ms_amount=" + msgCount, true);
 
     xhr.onload = function() {
       if(xhr.status != 200) return this.onerror();
 
-      const li = document.createElement('li');
-      li.textContent = this.responseText;
-      messages.appendChild(li);
+      const msgs = this.responseText.split('\n');
+      if(msgs.length > 1){
+        msgs.forEach((ms) => {
+          const li = document.createElement('li');
+          li.textContent = ms;
+          messages.appendChild(li);
+        })
+      } else {
+        const li = document.createElement('li');
+        li.textContent = this.responseText;
+        messages.appendChild(li);
+      }
 
       subscribe();
     };
