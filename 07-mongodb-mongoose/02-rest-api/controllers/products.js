@@ -16,7 +16,6 @@ module.exports.productsBySubcategory = async function productsBySubcategory(ctx,
   }
 
   const category = await Category.find({'subcategories._id': subcategory});
-  debugger;
   if (!category.length) {
     ctx.status = 200;
     ctx.body = {products: []};
@@ -29,7 +28,6 @@ module.exports.productsBySubcategory = async function productsBySubcategory(ctx,
 
 module.exports.productList = async function productList(ctx, next) {
   const {category} = ctx;
-  debugger;
   const products = await Product.find({category});
 
   ctx.body = {products: products.map(mapProduct)};
