@@ -23,9 +23,7 @@ const saveRequest = async (ctx) => {
     ctx.resolve = resolve;
     ctx.reject = reject;
     clients.push(ctx);
-  }).catch(() => {
-    debugger;
-  });
+  }).catch(console.error);
 };
 
 const setHandlers = async (ctx, next) => {
