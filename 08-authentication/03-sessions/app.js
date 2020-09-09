@@ -2,7 +2,7 @@ const path = require('path');
 const Koa = require('koa');
 const Router = require('koa-router');
 const Session = require('./models/Session');
-const { v4: uuid } = require('uuid');
+const {v4: uuid} = require('uuid');
 const handleMongooseValidationError = require('./libs/validationErrors');
 const mustBeAuthenticated = require('./libs/mustBeAuthenticated');
 const {login} = require('./controllers/login');
@@ -45,6 +45,20 @@ router.use(async (ctx, next) => {
   const header = ctx.request.get('Authorization');
   if (!header) return next();
 
+  const token = header.split(' ')[1];
+  if (!token) return next();
+  const session = await Session.findOne({token}).populate('user');
+
+  if (!session) {
+    ctx.response.status = 401;
+    ctx.response.body = {error: 'Неверный аутентификационный токен'};
+    return;
+  }
+
+  session.lastVisit = new Date();
+  await session.save();
+  ctx.user = session.user;
+
   return next();
 });
 
@@ -53,7 +67,7 @@ router.post('/login', login);
 router.get('/oauth/:provider', oauth);
 router.post('/oauth_callback', handleMongooseValidationError, oauthCallback);
 
-router.get('/me', me);
+router.get('/me', mustBeAuthenticated, me);
 
 app.use(router.routes());
 

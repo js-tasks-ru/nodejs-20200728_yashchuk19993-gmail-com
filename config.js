@@ -1,5 +1,5 @@
-const dbName = 'test_env';
-const password = 'm3zSEW36KftQTZs5';
+const dbName = '';
+const password = '';
 
 
 module.exports = {
